@@ -1,11 +1,12 @@
 ASSUME cs: code, ds: data 
 data SEGMENT
 
-a db 5
-b db 7
+a db 1
+b dw 7
 dreapta dw ?
-stanga dw ? 
-e dw ? 
+stanga dw ?
+e1 dw ?
+e db ? 
 
 data ENDS
 
@@ -15,37 +16,39 @@ start:
 mov ax, data
 mov ds, ax
 
-mov al,[a]
-mov ah,0
+mov al,a ;bxb = w
 mov bl, 5
-mul bl ; ax = a * 5
-mov [stanga], ax
+mul bl ;ax = 5a
+mov e1 , ax
 
-mov al,[b]
-mov ah,0
-mov bl, 7
-div bl ; al = b / 7
-mov ah,0;poate ramane rest,dar il consider 0
-sub [stanga], ax ; stanga = stanga - (b / 7)
+mov ax , b
+mov cx , 7
+mov dx , 0
+div cx ; ax = b/7
+mov bx , e1
+sub bx, ax ;bx = e1 - ax
+mov dreapta,bx ; dreapta = ax - bx
 
-mov al,[a]
-mov ah,0
-mul al ; ax = a * a
-mov bx, ax
+mov ax , 3
+mov dx, 0
+mov bx , b
+div bx ; al = 3/b
+mov ah , 0 ; ax = 3/b
 
-mov al,3
-mov ah,0
-div byte ptr [b] ; al = 3 / b
-mov ah,0
-add ax, bx ; ax = (a * a) + (3 / b)
-mov [dreapta], ax ; dreapta = (a * a) + (3 / b)
+mov bl , a
+mov cl , a
+mul cl ;bx = a*a
 
-mov ax, [stanga]
-xor dx, dx
+add ax, bx ; ax = 3/b + a*a
+mov stanga, ax
 
-mov [e], ax ; e = stanga / dreapta
+mov ax, dreapta
+mov dx, 0
+mov bx , stanga
+div stanga 
 
-mov ax, 4C00h
+mov e , al
+mov ax , 4C00h
 int 21h
 
 code ENDS
