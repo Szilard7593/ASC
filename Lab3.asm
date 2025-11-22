@@ -22,15 +22,17 @@ START:
  ; di pointeaz actre ultima pozitie a lui r
     ; setam DF = 1 pentru a copia de la sfarsit catre inceput
 
-    loop_b:
-    std
+                                         ;sau oare mergea mov al , [si]
+                                            ;mov [di] ,al
+                                            ;dec si?care ii mai eficient?
+    loop_b:                                    ;inc di
+        std
         lodsb
         cld
         stosb
-        
-
         loop loop_b
-    cld      ; la final setam DF = 0
+    cld  
+        ; la final setam DF = 0
 
     mov si, offset a
     mov di, offset r
