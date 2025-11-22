@@ -1,0 +1,46 @@
+assume cs:code , ds:data
+data segment
+    s db 1d,5d,3d,8d,2d,9d
+    l equ $-s 
+    d1 db l dup (?)
+    d2 db l dup (?)
+data ends
+
+code segment
+start:
+    mov ax , data
+    mov ds, ax
+    mov es, ax
+
+    mov si , offset s 
+    mov di , offset d1 
+    mov cx , l
+    mov bx , 0
+    jcxz final
+    loop_pozitie_para:
+        mov al,[si]
+        test bx,1
+        jnz impar_pozitie
+        stosb
+    impar_pozitie:
+        inc si
+        inc bx
+        loop loop_pozitie_para
+
+    mov si , offset s
+    mov di , offset d2
+    mov cx , l
+    mov bx , 0
+    loop_pozitie_impara:
+        mov al,[si]
+        test bx,1
+        jz skip_par_pozitie
+        stosb
+    skip_par_pozitie:
+        inc si
+        inc bx
+        loop loop_par_impara
+
+    final:
+        mov ax, 4C00H
+        int 21h
