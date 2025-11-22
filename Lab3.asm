@@ -19,12 +19,16 @@ START:
     dec si ; si ponteaz actre ultima pozitie a lui b , 
             ;pentru ca daca lansam pozitia normala el va fi pointer la un element ca nu exista
     mov di, offset r
-    add di, l_b
-    dec di ; di pointeaz actre ultima pozitie a lui r
-    std; setam DF = 1 pentru a copia de la sfarsit catre inceput
+ ; di pointeaz actre ultima pozitie a lui r
+    ; setam DF = 1 pentru a copia de la sfarsit catre inceput
 
     loop_b:
-        movsb;copiez din b in r, deoarece nu avem nevoie sa-i facem modificari
+    std
+        lodsb
+        cld
+        stosb
+        
+
         loop loop_b
     cld      ; la final setam DF = 0
 
@@ -34,7 +38,13 @@ START:
     mov cx, l_a ; punem in cx lungimea lui a
     loop_a:; verificam care elemente din a sunt impare, folosind test, care creeaza o operatie de and intre al si o masca
         lodsb; luam urmatorul element din a
-        test al,1;verificam daca e par sau impar
+        test al,1;verificam daca e par sau impar, echiva;ent cu puteam sa 
+        ;mov bl, al
+        ;and bl, 1
+        ;mov al,bl
+        ;jnz skip_par_a
+        ;stosb
+
         jz skip_par_a
         stosb; punem elementul impar in r
 
