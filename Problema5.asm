@@ -17,8 +17,8 @@ START:
     mov cx, l-1
     jcxz final
     loopd:
-        mov al, si[1]
-        mov bl, si[0]
+        mov al, [si+1] ; sau functioneaza si[1]?
+        mov bl, [si + 0]
         sub al, bl
         mov [di], al
         inc si
@@ -30,3 +30,4 @@ START:
         int 21h
 code ENDS
 END START
+
