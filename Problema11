@@ -1,0 +1,49 @@
+assume cs:code, ds:data
+data segment
+    a db 2d,1d,3d,-3d
+    la equ $ - a 
+    b db 4d,5d,-5d,7d
+    lb equ $ - b
+    r db la+lb dup (?)
+data ends
+
+code segment
+start:
+    mov ax , data
+    mov ds , ax
+    mov es, ax
+
+    mov si, offset a
+    mov di, offset r
+    mov cx, la 
+
+    loop_a:
+        lodsb
+        test al, 00000001b 
+        jz par
+        test al,10000000b 
+        jnz par
+        stosb
+
+    par:  
+        loop loop_a
+
+    mov si, offset b 
+    mov cx, lb 
+
+    loop_b:
+        lodsb
+        test al,00000001b 
+        jz negativ 
+        test al, 10000000b 
+        jnz negativ
+        stosb
+    
+    negativ:
+        loop loop_b
+
+    mov ax,4C00h
+    int 21h
+
+code ends
+end start
