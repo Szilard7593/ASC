@@ -1,9 +1,11 @@
 assume cs:code, ds:data
 data SEGMENT
 a db 2d, 1d, 3d, 3d, 4d, 2d, 6d
-b db 4d, 5d, 7d, 6d, 2d, 1d
 l_a equ $ - a
+
+b db 4d, 5d, 7d, 6d, 2d, 1d
 l_b equ $ - b
+
 r db l_a + l_b dup (?)
 data ENDS
 
@@ -15,7 +17,7 @@ START:
 
     mov si , offset b 
     mov cx, l_b ; punem in cx lungimea lui b
-    add si, l_b ; punem soarce indexul la finalul lui b
+    add si, l_b ; punem soarce indexul la   finalul lui b
     dec si ; si ponteaz actre ultima pozitie a lui b , 
             ;pentru ca daca lansam pozitia normala el va fi pointer la un element ca nu exista
     mov di, offset r
@@ -35,10 +37,8 @@ START:
         ; la final setam DF = 0
 
     mov si, offset a
-    mov di, offset r
-    add di, l_b ; di pointeaz actre prima pozitie libera din r
-    mov cx, l_a ; punem in cx lungimea lui a
-    loop_a:; verificam care elemente din a sunt impare, folosind test, care creeaza o operatie de and intre al si o masca
+    mov cx, l_a      ; punem in cx lungimea lui a
+    loop_a:     ; verificam care elemente din a sunt impare, folosind test, care creeaza o operatie de and intre al si o masca
         lodsb; luam urmatorul element din a
         test al,1;verificam daca e par sau impar, echiva;ent cu puteam sa 
         ;mov bl, al
