@@ -8,6 +8,7 @@ data segment
 data ends
 code segment
 Start:
+
     mov ax, data
     mov ds, ax
     mov es,ax
@@ -17,6 +18,13 @@ Start:
         lea dx,nrMax
         int 21h
 
+    adaugare_linie_noua:
+        mov ah, 02h
+        mov dl, 0Dh     ; CR(cariedge return) - revine la începutul liniei
+        int 21h
+        mov dl, 0Ah     ; LF(line feed) - coboară o linie
+        int 21h
+    
     mov si, offset a 
     mov di, offset r 
     mov cl, [lungime] 
@@ -37,14 +45,16 @@ Start:
 
     mov byte ptr [di], '$' ;creeaza outpul random, de ce?
     ;1234 -> 2434, de unde 34?
+    ;dadea overwrite la linia introdusa ceeea ce crea numai
+    ;sa apara schimbate primele elemente
     printam_sir:
         mov ah,09h
         mov dx, offset r
         int 21h
 
-
     final:
         mov ax,4C00h
         int 21h
+
 code ends
 end start
