@@ -5,104 +5,140 @@ data segment
     lungime db ?
     sir_intermediar db 6 dup (?)
 
-    sir_polisat db 6 dup (?)
-    sir_final db 6 dup (? )
+    sir_final db 8 dup (?) 
 
-    nr dw ?
+    nr_1 dw ?
     nr_2 dw ?
-    nr_3 db ?
-
+    
     fisier db 'nr.txt',0
+    file_handle dw ?      
 
-    v1 db 10
+    v1 dw 10              
     v2 dw 2
 
-    identificator_creare dw ?
-    identificator_deschidere dw ?
-    identificar_inchidere dw ?
+    mesaj_eroare db 'Eroare la fisier$'
+    mesaj2 db 'numar de 4 cifre obligaoriu, introfuceti din nou: $'
+
 data ends
 
 code segment
 
-creare_fisier PROC
-    mov ah, 3Ch
-    mov cx, 0
-    mov dx, offset fisier
+eroare PROC
+    mov ah, 09h
+    mov dx, offset mesaj_eroare
     int 21h
-    mov identificar_creare, ax
-    RET
-creare_fisier ENDP
+    ret
+eroare ENDP
 
-deschidere_fisier PROC
-    mov ah, 3Dh
-    mov al, 1
-    mov dx, offset fisier
+eroare_2 PROC
+    mov ah, 09h
+    mov dx, offset mesaj2
     int 21h
-    mov identificator_deschidere, ax
-    RET
-deschidere_fisier ENDP
+    ret
+eroare_2 ENDP
 
-inchidere_fisier PROC
-    mov ah, 3Eh
-    mov bx, identificator_deschidere
+linieNoua PROC
+    mov ah, 02h
+    mov dl, 0Dh     
     int 21h
-    RET
-inchidere_fisier ENDP
-
-scriere_fisier PROC
-    mov ah, 40h 
-    mov cx, 2
-    mov bx, identificator_deschidere
-    mov dx, offset sir_final
+    mov dl, 0Ah     
     int 21h
-    RET
-scriere_fisier ENDP
-
+    ret
+linieNoua ENDP
 
 Start:
 
     mov ax, data
     mov ds, ax
 
-    mov ah, 0Ah
-    lea dx, nrMax
-    int 21h
+    inceput:
 
-    mov si, offset sir_intermediar
-    mov di, offset sir_polisat
-    mov cl, [lungime]
-    mov ch, 0
-    ;mai intai cream numarul si-l pune in ax
-    loop_sir_polisat:
-        mov al , [si]
-        sub al ,'0'
-        mov [di] , al
-        inc si
-        inc di
-        loop loop_sir_polisat
+        mov ah, 0Ah
+        lea dx, nrMax
+        int 21h
 
-    mov si, offset sir_polisat
-    mov cl, [lungime]
-    mov ch, 0
-    xor ax,ax
-    loop_peste_sir_polisat:
-        mul v1
-        add ax,[si]
-        inc si
-        loop loop_peste_sir_polisat
+        mov si, offset sir_intermediar
+        xor cx, cx
+        mov cl, [lungime]
+        
+        xor ax, ax          
+        xor bx, bx         
+        
+        loop_str_to_int:
+            mul v1     
+            
+            mov bl, [si]    
+            sub bl, '0'     
+            add ax, bx      
+            
+            inc si
+            loop loop_str_to_int
 
-    ;transformare din caractere in numar
-    mov nr, ax
-    mov ax , nr
-    mul v2
-    mov nr_2,ax
+        cmp ax, 10000
+        ja mesaj_2
+
+        mul v2              
+        mov nr_2, ax 
+
+        mov ax, nr_2        
+        mov bx, 10
+        mov si, offset sir_final
+        xor cx, cx          
+
+        convert_loop:
+            xor dx, dx      
+            div bx          
+            push dx         
+            inc cx         
+            cmp ax, 0       
+            jne convert_loop
+
+        mov [lungime], cl   
+        mov di, offset sir_final
+        
+        pop_loop:
+            pop dx        
+            add dl, '0'     
+            mov [di], dl
+            inc di
+            loop pop_loop
+        
     
-    call inchidere_fisier
+        mov ah, 3Ch
+        mov cx, 0
+        mov dx, offset fisier
+        int 21h
 
-    mov ax,4C00h
+        jc mesaj_1          
+        mov file_handle, ax 
+
+        mov ah, 40h
+        mov bx, file_handle
+        xor cx, cx
+        mov cl, [lungime]   
+        mov dx, offset sir_final
+        int 21h
+        jc mesaj_1
+
+
+        mov ah, 3Eh
+        mov bx, file_handle
+        int 21h
+
+        jmp final
+
+mesaj_1:
+    call eroare
+
+mesaj_2:
+    call eroare_2
+    adaugare_linie_noua:
+        call linieNoua
+    jmp inceput
+
+final:
+    mov ax, 4C00h
     int 21h
 
 code ends
 end start
-
-
